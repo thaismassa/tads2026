@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Bem-vindo!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Poppins:wght@500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(120deg, #ffecd2 0%, #fcb69f 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .boas-vindas {
+            font-family: 'Montserrat', 'Poppins', Arial, sans-serif;
+            font-size: 4em;
+            color: #e476af; /* Mudou cor para rosa vibrante */
+            margin-top: 0.6em;
+            text-shadow: 2px 4px 18px #fff3ec, 1px 2px 0px #b4376d;
+            letter-spacing: 2px;
+            text-align: center;
+            background: linear-gradient(90deg, #fcb69f 0%, #e476af 100%);
+            border-radius: 24px;
+            padding: 40px 50px 35px 50px;
+            box-shadow: 0 8px 24px #ffd6ec;
+            transition: background 0.2s, filter 0.2s;
+            cursor: pointer;
+            user-select: none;
+        }
+        .boas-vindas:hover {
+            filter: brightness(1.08);
+        }
+        .sub-text {
+            font-family: 'Poppins', Arial, sans-serif;
+            font-size: 1.7em;
+            color: #af30c4;
+            margin-top: 16px;
+            text-align: center;
+        }
+        #game-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 2em;
+        }
+        #pergunta {
+            font-family: 'Montserrat', 'Poppins', Arial, sans-serif;
+            font-size: 2em;
+            color: #333;
+            margin-bottom: 18px;
+        }
+        #input-resposta {
+            font-size: 1.3em;
+            padding: 5px 12px;
+            border-radius: 9px;
+            border: 1px solid #e798d3;
+            margin-right: 8px;
+            width: 80px;
+            text-align: center;
+        }
+        #btn-verificar {
+            font-size: 1.1em;
+            font-family: 'Poppins', Arial, sans-serif;
+            padding: 5px 25px;
+            border-radius: 8px;
+            background: #e476af;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #btn-verificar:hover {
+            background: #b4376d;
+        }
+        #feedback {
+            margin-top: 15px;
+            font-size: 1.4em;
+            font-family: 'Poppins', Arial, sans-serif;
+            color: #1db43b;
+            min-height: 24px;
+            text-align: center;
+        }
+        #motivacao-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 2.5em;
+        }
+        #motivacao {
+            font-family: 'Montserrat', Arial, sans-serif;
+            font-size: 2.5em;
+            color: #b4376d;
+            text-shadow: 1px 2px 10px #fff8f3;
+            text-align: center;
+            margin-bottom: 18px;
+            animation: pulse 1.2s infinite alternate;
+        }
+        #btn-continuar {
+            font-size: 1.1em;
+            font-family: 'Poppins', Arial, sans-serif;
+            padding: 8px 28px;
+            border-radius: 9px;
+            background: #e476af;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #btn-continuar:hover {
+            background: #b4376d;
+        }
+
+        @keyframes pulse {
+            0% { filter: brightness(1.0); }
+            100% { filter: brightness(1.12) drop-shadow(0 0 9px #ffc5ec); }
+        }
+        @media (max-width: 700px) {
+            .boas-vindas {
+                font-size: 2em;
+                padding: 28px 14px;
+            }
+            .sub-text { font-size: 1.1em; }
+            #pergunta { font-size: 1.1em; }
+            #motivacao { font-size: 1.1em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="boas-vindas" onclick="startGame()">
+        Bem-vind@ ao Mundo da Tabuada! <br> Clique aqui para testar seu raciocínio rápido!
+    </div>
+    <div class="sub-text" id="sub-text">
+        Vamos praticar multiplicação até 10 de forma divertida e fácil :)<br>
+        <span style="font-size: 0.65em; color:#b4376d;">Preparad@? Clique na mensagem acima!</span>
+    </div>
+    <div id="game-container">
+        <div id="pergunta"></div>
+        <input type="number" id="input-resposta" autocomplete="off" />
+        <button id="btn-verificar">Verificar</button>
+        <div id="feedback"></div>
+    </div>
+    <div id="motivacao-container">
+        <div id="motivacao"></div>
+        <button id="btn-continuar">Continuar</button>
+    </div>
+    <script>
+        // Apenas multiplicação, tabuada até 10
+        let perguntaAtual = {};
+        let perguntasRespondidas = 0;
+        let motivacaoIndex = 0;
+
+        const frasesMotivacionais = [
+            "Você está indo super bem, continue assim! ⭐",
+            "Que incrível, você está arrasando! 🚀",
+            "Seu esforço está dando resultado! 👏",
+            "Você está melhorando cada vez mais, parabéns! 🦸‍♂️",
+            "Uau! Matemática está fácil pra você! 😍",
+            "Continue praticando, o sucesso é seu! 💡",
+            "Genial! Sua mente é poderosa! 🧠",
+            "Você merece todos os parabéns! 🥇",
+            "Sensacional, matemática ficou fácil! 🧃",
+            "Mais uma rodada venceu! Pront@ para outra? 🎯"
+        ];
+
+        function startGame() {
+            document.querySelector('.boas-vindas').style.display = 'none';
+            document.getElementById('sub-text').style.display = 'none';
+            document.getElementById('game-container').style.display = 'flex';
+            document.getElementById('motivacao-container').style.display = 'none';
+            perguntasRespondidas = 0;
+            motivacaoIndex = 0;
+            proximaPergunta();
+            document.getElementById('input-resposta').focus();
+        }
+
+        function gerarPergunta() {
+            const a = Math.floor(Math.random() * 10) + 1;
+            const b = Math.floor(Math.random() * 10) + 1;
+            return {
+                a, b,
+                operacao: '×',
+                func: (a, b) => a * b,
+                resposta: a * b
+            };
+        }
+
+        function proximaPergunta() {
+            perguntaAtual = gerarPergunta();
+            let perguntaTexto = `${perguntaAtual.a} × ${perguntaAtual.b} = ?`;
+            document.getElementById('pergunta').textContent = perguntaTexto;
+            document.getElementById('input-resposta').value = '';
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('input-resposta').focus();
+        }
+
+        document.getElementById('btn-verificar').onclick = function() {
+            verificarResposta();
+        };
+        document.getElementById('input-resposta').addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                verificarResposta();
+            }
+        });
+
+        function verificarResposta() {
+            const respostaUsuario = parseInt(document.getElementById('input-resposta').value);
+            if (isNaN(respostaUsuario)) {
+                document.getElementById('feedback').textContent = 'Digite um número válido!';
+                document.getElementById('feedback').style.color = '#ff3c00';
+                return;
+            }
+            if (respostaUsuario === perguntaAtual.resposta) {
+                document.getElementById('feedback').textContent = 'Parabéns! 🎉 Resposta correta!';
+                document.getElementById('feedback').style.color = '#1db43b';
+                setTimeout(() => {
+                    perguntasRespondidas++;
+                    if (perguntasRespondidas % 10 === 0) {
+                        mostrarMotivacao();
+                    } else {
+                        proximaPergunta();
+                    }
+                }, 1000);
+            } else {
+                document.getElementById('feedback').textContent = 'Ops! Tente de novo!';
+                document.getElementById('feedback').style.color = '#e476af';
+                document.getElementById('input-resposta').focus();
+            }
+        }
+
+        function mostrarMotivacao() {
+            document.getElementById('game-container').style.display = 'none';
+            document.getElementById('motivacao-container').style.display = 'flex';
+            const frase = frasesMotivacionais[motivacaoIndex % frasesMotivacionais.length];
+            document.getElementById('motivacao').textContent = frase;
+            motivacaoIndex++;
+        }
+
+        document.getElementById('btn-continuar').onclick = function() {
+            document.getElementById('motivacao-container').style.display = 'none';
+            document.getElementById('game-container').style.display = 'flex';
+            proximaPergunta();
+        };
+
+    </script>
+</body>
+</html>
