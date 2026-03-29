@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz Bíblico Infantil</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(120deg, #f8ffae 0%, #43c6ac 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #inicio-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 3em;
+        }
+        .boas-vindas {
+            font-family: 'Montserrat', 'Comic Neue', Arial, sans-serif;
+            font-size: 3em;
+            color: #16a085;
+            margin-top: 0.5em;
+            letter-spacing: 2px;
+            text-align: center;
+            background: linear-gradient(90deg, #fff0f7 0%, #43c6ac 100%);
+            border-radius: 20px;
+            padding: 34px 35px 28px 35px;
+            box-shadow: 0 6px 15px #cdeca6;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+        .boas-vindas:hover {
+            filter: brightness(1.10);
+        }
+        .sub-text {
+            font-family: 'Comic Neue', Arial, sans-serif;
+            font-size: 1.6em;
+            color: #195870;
+            margin-top: 10px;
+            text-align: center;
+        }
+        #quiz-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 2em;
+            width: 90vw;
+            max-width: 480px;
+        }
+        #pergunta {
+            font-family: 'Comic Neue', Arial, sans-serif;
+            font-size: 1.6em;
+            color: #1b5445;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        .opcoes-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            margin-bottom: 16px;
+            gap: 12px;
+        }
+        .opcao {
+            font-family: 'Comic Neue', Arial, sans-serif;
+            font-size: 1.2em;
+            background: #e7ffe0;
+            border: 2px solid #61e1c3;
+            border-radius: 10px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.15s, border 0.15s;
+            text-align: left;
+            outline: none;
+        }
+        .opcao.selected {
+            background: #43c6ac;
+            border-color: #195870;
+            color: #fff;
+        }
+        .opcao.correct {
+            background: #7dfc6e;
+            border-color: #32bf18;
+            color: #145418;
+        }
+        .opcao.incorrect {
+            background: #fd8d8d;
+            border-color: #ee4755;
+            color: #a9272b;
+        }
+        #btn-proxima {
+            margin-top: 9px;
+            font-size: 1.2em;
+            padding: 8px 18px;
+            background: #009688;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Montserrat', 'Comic Neue', Arial, sans-serif;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #btn-proxima:hover {
+            background: #195870;
+        }
+        #feedback {
+            font-family: 'Comic Neue', Arial, sans-serif;
+            font-size: 1.22em;
+            min-height: 24px;
+            text-align: center;
+            margin: 9px 0;
+        }
+        #final-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 2em;
+        }
+        #parabens-final {
+            font-family: 'Montserrat', 'Comic Neue', Arial, sans-serif;
+            font-size: 2.3em;
+            color: #ff9800;
+            text-shadow: 0 2px 10px #fffdb9;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        #pontuacao-final {
+            font-family: 'Comic Neue', Arial, sans-serif;
+            font-size: 1.5em;
+            color: #00675b;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        #btn-reiniciar {
+            font-size: 1.1em;
+            padding: 8px 27px;
+            background: #43c6ac;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Montserrat', 'Comic Neue', Arial, sans-serif;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #btn-reiniciar:hover {
+            background: #009688;
+        }
+        @media (max-width: 550px) {
+            .boas-vindas { font-size: 1.8em; padding: 18px 2px; }
+            .sub-text { font-size: 0.9em; }
+            #pergunta { font-size: 1em; }
+        }
+    </style>
+</head>
+<body>
+    <audio id="audio-certo" src="https://cdn.pixabay.com/audio/2022/10/16/audio_12c93b1d1b.mp3"></audio>
+    <audio id="audio-errado" src="https://cdn.pixabay.com/audio/2022/03/15/audio_115b9a8cfe.mp3"></audio>
+    <!-- Novo: Audio de alegria para qualquer resposta -->
+    <audio id="audio-alegria" src="https://cdn.pixabay.com/audio/2022/07/26/audio_1234e6b357.mp3"></audio>
+    <div id="inicio-container">
+        <div class="boas-vindas" onclick="comecarQuiz()">
+            Bem-vindo ao Super Desafio da Bíblia! <br>
+            <span style="font-size:0.55em; color: #195870; font-family: 'Comic Neue', Arial, sans-serif;">
+                Clique aqui para brincar e aprender!
+            </span>
+        </div>
+        <div class="sub-text">
+            Perguntinhas divertidas e de matemática,<br>
+            para crianças de 4 até 11 anos.<br>
+            Chame os amigos para jogar com alegria!
+        </div>
+    </div>
+    <div id="quiz-container">
+        <div id="pergunta"></div>
+        <div class="opcoes-container" id="opcoes-container"></div>
+        <div id="feedback"></div>
+        <button id="btn-proxima" onclick="proximaPergunta()" style="display:none;">Próxima</button>
+    </div>
+    <div id="final-container">
+        <div id="parabens-final">🎉 Parabéns pelo seu esforço! 🎉</div>
+        <div id="pontuacao-final"></div>
+        <button id="btn-reiniciar" onclick="reiniciarQuiz()">Tentar de novo</button>
+    </div>
+    <script>
+        // Quiz simples para crianças de 4 a 11 anos, perguntas fáceis e sem imagens agora
+        const perguntas = [
+            {
+                texto: "Quem construiu uma arca muito grande para os animais?",
+                opcoes: ["Moisés", "Noé", "Davi", "Pedro"],
+                correta: 1
+            },
+            {
+                texto: "Quem era muito forte porque Deus o ajudava?",
+                opcoes: ["Sansão", "Jonas", "Raabe", "José"],
+                correta: 0
+            },
+            {
+                texto: "Qual o nome do menino que venceu o gigante Golias?",
+                opcoes: ["Abraão", "Davi", "Salomão", "Daniel"],
+                correta: 1
+            },
+            {
+                texto: "Quem ficou dentro da barriga de um grande peixe?",
+                opcoes: ["Elias", "Jonas", "Samuel", "Lucas"],
+                correta: 1
+            },
+            {
+                texto: "Quem foi a mãe de Jesus?",
+                opcoes: ["Marta", "Priscila", "Sara", "Maria"],
+                correta: 3
+            },
+            {
+                texto: "Quem dividiu o mar em dois para o povo passar?",
+                opcoes: ["Noé", "Josué", "Moisés", "Isaías"],
+                correta: 2
+            },
+            {
+                texto: "Quem fez a arca da aliança?",
+                opcoes: ["Bezalel", "Samuel", "João", "Jesus"],
+                correta: 0
+            },
+            {
+                texto: "Quem foi jogado numa cova com leões e não se machucou?",
+                opcoes: ["Ester", "Daniel", "Isaac", "Jacó"],
+                correta: 1
+            },
+            {
+                texto: "Qual animal falou com Balaão?",
+                opcoes: ["Cachorro", "Asna (jumenta)", "Leão", "Peixe"],
+                correta: 1
+            },
+            {
+                texto: "O nome do jardim onde Deus criou Adão e Eva era...",
+                opcoes: ["Jardim do Éden", "Jardim das Oliveiras", "Jardim de Deus", "Jardim da Paz"],
+                correta: 0
+            }
+        ];
+
+        let perguntaAtual = 0;
+        let respostaSelecionada = null;
+        let pontuacao = 0;
+
+        function tocarAudioCerto() {
+            try { document.getElementById('audio-certo').currentTime = 0; } catch {}
+            document.getElementById('audio-certo').play();
+        }
+        function tocarAudioErrado() {
+            try { document.getElementById('audio-errado').currentTime = 0; } catch {}
+            document.getElementById('audio-errado').play();
+        }
+        function tocarAudioAlegria() {
+            try { document.getElementById('audio-alegria').currentTime = 0; } catch {}
+            document.getElementById('audio-alegria').play();
+        }
+
+        function comecarQuiz() {
+            document.getElementById('inicio-container').style.display = 'none';
+            document.getElementById('quiz-container').style.display = 'flex';
+            document.getElementById('final-container').style.display = 'none';
+            perguntaAtual = 0;
+            pontuacao = 0;
+            mostrarPergunta();
+        }
+
+        function mostrarPergunta() {
+            if (perguntaAtual >= perguntas.length) {
+                // Finalizou
+                mostrarFinal();
+                return;
+            }
+            const p = perguntas[perguntaAtual];
+
+            document.getElementById('pergunta').textContent = p.texto;
+            // Opções
+            const opcoesDiv = document.getElementById('opcoes-container');
+            opcoesDiv.innerHTML = '';
+            p.opcoes.forEach((op, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'opcao';
+                btn.textContent = op;
+                btn.onclick = function() { selecionarOpcao(idx); };
+                btn.setAttribute('tabindex', '0');
+                opcoesDiv.appendChild(btn);
+            });
+            respostaSelecionada = null;
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('btn-proxima').style.display = 'none';
+        }
+
+        function selecionarOpcao(idx) {
+            if (respostaSelecionada !== null) return; // Já respondeu
+            respostaSelecionada = idx;
+            const p = perguntas[perguntaAtual];
+            const opBtns = document.querySelectorAll('.opcao');
+            opBtns.forEach((btn, i) => {
+                btn.classList.remove('selected');
+                if (i === idx) btn.classList.add('selected');
+            });
+            setTimeout(() => {
+                // Marca certo/errado visualmente
+                opBtns.forEach((btn, i) => {
+                    btn.classList.remove('selected');
+                    if (i === p.correta) btn.classList.add('correct');
+                    else if (i === idx) btn.classList.add('incorrect');
+                });
+                // Feedback e áudio!
+                let feedbackMsg = '';
+                // TOCA SEMPRE áudio de alegria, pois o usuário pediu para "cada pergunta respondida"
+                tocarAudioAlegria();
+                if (idx === p.correta) {
+                    pontuacao++;
+                    feedbackMsg = "Parabéns! Resposta certa! 😀";
+                    tocarAudioCerto();
+                } else {
+                    feedbackMsg = `Ops! A resposta certa era "${p.opcoes[p.correta]}". 🙁`;
+                    tocarAudioErrado();
+                }
+                document.getElementById('feedback').textContent = feedbackMsg;
+                document.getElementById('btn-proxima').style.display = '';
+            }, 300);
+        }
+
+        function proximaPergunta() {
+            perguntaAtual++;
+            mostrarPergunta();
+        }
+
+        function mostrarFinal() {
+            document.getElementById('quiz-container').style.display = 'none';
+            document.getElementById('final-container').style.display = 'flex';
+            const msg = pontuacao === perguntas.length
+                ? "Uau! Você acertou tudo! Jesus está muito feliz com você! 😍"
+                : pontuacao >= perguntas.length/2
+                    ? "Muito bem! Você conhece bastante histórias da Bíblia!"
+                    : "Continue tentando, está indo muito bem!";
+            document.getElementById('parabens-final').textContent = msg;
+            document.getElementById('pontuacao-final').textContent =
+                `Pontuação: ${pontuacao} de ${perguntas.length} perguntas.`;
+        }
+
+        function reiniciarQuiz() {
+            document.getElementById('final-container').style.display = 'none';
+            document.getElementById('inicio-container').style.display = 'flex';
+        }
+    </script>
+</body>
+</html>
