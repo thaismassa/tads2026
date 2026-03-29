@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Bem-vindo!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Poppins:wght@500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(120deg, #ffecd2 0%, #fcb69f 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .boas-vindas {
+            font-family: 'Montserrat', 'Poppins', Arial, sans-serif;
+            font-size: 4em;
+            color: #ff6f61;
+            margin-top: 0.6em;
+            text-shadow: 2px 4px 18px #fff3ec, 1px 2px 0px #ba3b19;
+            letter-spacing: 2px;
+            text-align: center;
+            background: linear-gradient(90deg, #f6d365 0%, #fda085 100%);
+            border-radius: 24px;
+            padding: 40px 50px 35px 50px;
+            box-shadow: 0 8px 24px #ffdcc7;
+            transition: background 0.2s, filter 0.2s;
+            cursor: pointer;
+            user-select: none;
+        }
+        .boas-vindas:hover {
+            filter: brightness(1.08);
+        }
+        .sub-text {
+            font-family: 'Poppins', Arial, sans-serif;
+            font-size: 1.7em;
+            color: #ab4700;
+            margin-top: 16px;
+            text-align: center;
+        }
+        #game-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 2em;
+        }
+        #pergunta {
+            font-family: 'Montserrat', 'Poppins', Arial, sans-serif;
+            font-size: 2em;
+            color: #333;
+            margin-bottom: 18px;
+        }
+        #input-resposta {
+            font-size: 1.3em;
+            padding: 5px 12px;
+            border-radius: 9px;
+            border: 1px solid #f6a37a;
+            margin-right: 8px;
+            width: 80px;
+            text-align: center;
+        }
+        #btn-verificar {
+            font-size: 1.1em;
+            font-family: 'Poppins', Arial, sans-serif;
+            padding: 5px 25px;
+            border-radius: 8px;
+            background: #ff6f61;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #btn-verificar:hover {
+            background: #e56051;
+        }
+        #feedback {
+            margin-top: 15px;
+            font-size: 1.4em;
+            font-family: 'Poppins', Arial, sans-serif;
+            color: #1db43b;
+            min-height: 24px;
+            text-align: center;
+        }
+        @media (max-width: 700px) {
+            .boas-vindas {
+                font-size: 2em;
+                padding: 28px 14px;
+            }
+            .sub-text { font-size: 1.1em; }
+            #pergunta { font-size: 1.1em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="boas-vindas" onclick="startGame()">
+        Bem-vindo(a)!
+    </div>
+    <div class="sub-text" id="sub-text">
+        Que bom ter você aqui 😊<br>
+        Prepare-se para se divertir e aprender com nossos cálculos!<br>
+        <span style="font-size: 0.65em; color:#7d3925;">Clique em "Bem-vindo(a)!" para iniciar</span>
+    </div>
+    <div id="game-container">
+        <div id="pergunta"></div>
+        <input type="number" id="input-resposta" autocomplete="off" />
+        <button id="btn-verificar">Verificar</button>
+        <div id="feedback"></div>
+    </div>
+    <script>
+        // Lista de operações possíveis
+        const operacoes = [
+            { texto: '+', func: (a, b) => a + b },
+            { texto: '-', func: (a, b) => a - b },
+            { texto: '×', func: (a, b) => a * b },
+            { texto: '÷', func: (a, b) => a / b }
+        ];
+
+        let perguntaAtual = {};
+        let tentativas = 0;
+
+        function startGame() {
+            document.querySelector('.boas-vindas').style.display = 'none';
+            document.getElementById('sub-text').style.display = 'none';
+            document.getElementById('game-container').style.display = 'flex';
+            proximaPergunta();
+            document.getElementById('input-resposta').focus();
+        }
+
+        function gerarPergunta() {
+            // Operações: Adição, Subtração, Multiplicação, Divisão
+            const escolhido = operacoes[Math.floor(Math.random() * operacoes.length)];
+            let a, b, respostaCorreta;
+
+            if (escolhido.texto === '+') {
+                a = Math.floor(Math.random() * 90 + 10);
+                b = Math.floor(Math.random() * 90 + 10);
+            } else if (escolhido.texto === '-') {
+                a = Math.floor(Math.random() * 90 + 10);
+                b = Math.floor(Math.random() * a); // Para resultado não-negativo
+            } else if (escolhido.texto === '×') {
+                a = Math.floor(Math.random() * 11 + 2);
+                b = Math.floor(Math.random() * 10 + 2);
+            } else if (escolhido.texto === '÷') {
+                b = Math.floor(Math.random() * 9 + 2);
+                respostaCorreta = Math.floor(Math.random() * 10 + 2);
+                a = b * respostaCorreta;
+            }
+
+            if (escolhido.texto !== '÷') {
+                respostaCorreta = escolhido.func(a, b);
+            }
+
+            return {
+                a, b,
+                operacao: escolhido.texto,
+                func: escolhido.func,
+                resposta: respostaCorreta
+            };
+        }
+
+        function proximaPergunta() {
+            perguntaAtual = gerarPergunta();
+            let perguntaTexto = '';
+
+            if (perguntaAtual.operacao === '÷') {
+                perguntaTexto = `${perguntaAtual.a} ÷ ${perguntaAtual.b} = ?`;
+            } else if (perguntaAtual.operacao === '×') {
+                perguntaTexto = `${perguntaAtual.a} × ${perguntaAtual.b} = ?`;
+            } else {
+                perguntaTexto = `${perguntaAtual.a} ${perguntaAtual.operacao} ${perguntaAtual.b} = ?`;
+            }
+
+            document.getElementById('pergunta').textContent = perguntaTexto;
+            document.getElementById('input-resposta').value = '';
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('input-resposta').focus();
+        }
+
+        document.getElementById('btn-verificar').onclick = function() {
+            verificarResposta();
+        };
+        document.getElementById('input-resposta').addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                verificarResposta();
+            }
+        });
+
+        function verificarResposta() {
+            const respostaUsuario = parseFloat(document.getElementById('input-resposta').value.replace(',', '.'));
+            if (isNaN(respostaUsuario)) {
+                document.getElementById('feedback').textContent = 'Digite um número válido!';
+                document.getElementById('feedback').style.color = '#ff3c00';
+                return;
+            }
+            if (Math.abs(respostaUsuario - perguntaAtual.resposta) < 0.0001) {
+                document.getElementById('feedback').textContent = 'Parabéns! 🎉 Resposta correta!';
+                document.getElementById('feedback').style.color = '#1db43b';
+                setTimeout(() => {
+                    proximaPergunta();
+                }, 1300);
+            } else {
+                document.getElementById('feedback').textContent = 'Ops! Tente de novo!';
+                document.getElementById('feedback').style.color = '#ff6f61';
+                document.getElementById('input-resposta').focus();
+            }
+        }
+    </script>
+</body>
