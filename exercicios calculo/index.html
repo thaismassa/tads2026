@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Jogo de Operações Matemáticas</title>
+    <script>
+        let numero1, numero2, operacao, respostaCerta;
+
+        function novaConta() {
+            const operacoes = [
+                {simbolo: '+', nome: "Adição"},
+                {simbolo: '-', nome: "Subtração"},
+                {simbolo: '×', nome: "Multiplicação"},
+                {simbolo: '÷', nome: "Divisão"}
+            ];
+
+            // Escolhe uma operação aleatória
+            const idxOp = Math.floor(Math.random() * operacoes.length);
+            operacao = operacoes[idxOp].simbolo;
+
+            // Gera números conforme a operação
+            if (operacao === '+') {
+                numero1 = Math.floor(Math.random() * 50) + 1;
+                numero2 = Math.floor(Math.random() * 50) + 1;
+                respostaCerta = numero1 + numero2;
+            } else if (operacao === '-') {
+                numero1 = Math.floor(Math.random() * 50) + 1;
+                numero2 = Math.floor(Math.random() * numero1) + 1; // garante número positivo
+                respostaCerta = numero1 - numero2;
+            } else if (operacao === '×') {
+                numero1 = Math.floor(Math.random() * 12) + 1;
+                numero2 = Math.floor(Math.random() * 12) + 1;
+                respostaCerta = numero1 * numero2;
+            } else if (operacao === '÷') {
+                // Faz divisões exatas, sem resto
+                numero2 = Math.floor(Math.random() * 12) + 1;
+                respostaCerta = Math.floor(Math.random() * 12) + 1;
+                numero1 = numero2 * respostaCerta;
+            }
+
+            document.getElementById('pergunta').innerText = `${numero1} ${operacao} ${numero2} = `;
+            document.getElementById('inputResposta').value = '';
+            document.getElementById('mensagem').innerText = '';
+            document.getElementById('inputResposta').focus();
+        }
+
+        function checarResposta() {
+            const respostaUsuario = document.getElementById('inputResposta').value.trim();
+            let resposta;
+
+            if (operacao === '÷') {
+                // Permite resposta como float
+                resposta = parseFloat(respostaUsuario.replace(',', '.'));
+            } else {
+                resposta = parseInt(respostaUsuario);
+            }
+
+            let correta;
+            if (operacao === '÷') {
+                // Para divisão pode digitar 2 casas decimais
+                correta = (Math.abs(resposta - respostaCerta) < 0.01);
+            } else {
+                correta = (resposta === respostaCerta);
+            }
+
+            if (correta) {
+                document.getElementById('mensagem').innerText = 'Parabéns! 🎉';
+                setTimeout(novaConta, 1000);
+            } else {
+                document.getElementById('mensagem').innerText = 'Tente novamente!';
+            }
+        }
+
+        window.onload = function() {
+            // Cria uma "pasta" visual
+            const pastaDiv = document.createElement('div');
+            pastaDiv.style.border = "2px solid #3CB371";
+            pastaDiv.style.background = "#D8FFDA";
+            pastaDiv.style.width = "230px";
+            pastaDiv.style.padding = "12px";
+            pastaDiv.style.margin = "25px auto 10px auto";
+            pastaDiv.style.borderRadius = "13px";
+            pastaDiv.style.textAlign = "center";
+            pastaDiv.style.boxShadow = "0 0 10px #B0FFCB";
+            pastaDiv.style.fontSize = "17px";
+            pastaDiv.innerHTML = "<strong>📂 Pasta de Exercícios</strong>";
+
+            document.body.prepend(pastaDiv);
+
+            novaConta();
+        }
+    </script>
+    <style>
+        #jogo {
+            margin: 40px auto;
+            padding: 25px;
+            background: #f7faff;
+            border-radius: 10px;
+            width: 280px;
+            text-align: center;
+            box-shadow: 0 2px 10px #eaeaea;
+            font-family: Arial, sans-serif;
+        }
+        input[type="number"], input[type="text"] {
+            width: 70px;
+            font-size: 16px;
+            padding: 5px;
+            text-align: center;
+        }
+        #mensagem {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        button {
+            margin-top: 7px;
+            font-size: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div id="jogo">
+        <h2>Jogo de Operações Matemáticas</h2>
+        <span id="pergunta"></span>
+        <input type="text" id="inputResposta" autocomplete="off" onkeydown="if(event.key==='Enter') checarResposta();">
+        <button onclick="checarResposta()">Responder</button>
+        <div id="mensagem"></div>
+        <br>
+        <button onclick="novaConta()">Nova Conta</button>
+    </div>
+</body>
